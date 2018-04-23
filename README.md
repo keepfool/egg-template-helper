@@ -63,7 +63,7 @@ create files by the [name] and a specified type.
 #### New Options
 
 | name | type | description |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | category | string | new file category |
 | test | boolean | whether append test for controller / service / model  |
 
