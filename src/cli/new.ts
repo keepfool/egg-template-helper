@@ -13,7 +13,7 @@ import { LangExt } from '../declare'
 
 export namespace NewCommand {
   export interface Options {
-    type: string
+    category: string
     /**
      * 相对于路径
      * 如果是controller，则是相对于app/controller的路径
@@ -21,7 +21,8 @@ export namespace NewCommand {
      * 果是model，则是相对于app/model的路径
      */
     relPath: string
-    customData?: string
+    data?: string
+    test?: boolean
   }
 
   export interface CLIOptions {
@@ -35,15 +36,14 @@ export class NewCommand {
   }
 
   async run (name: string) {
-    let options: NewCommand.Options = { type: this.options.type, relPath: name }
-
+    let options: NewCommand.Options = { category: this.options.category, test: this.options.test, relPath: name }
     // 获取 answers
     let answers: NewAnswers = await getAnswers(options)
 
     // 字段做容错处理
     let defaults: NewAnswers = {
       ...options,
-      customData: '{}'
+      data: '{}'
     }
 
     answers = _.merge({}, defaults, answers)
@@ -51,35 +51,52 @@ export class NewCommand {
     await this.createFile(answers)
   }
   private async createFile (answers: NewAnswers) {
-    let { type, relPath = '', customData } = answers
+    let { category, relPath = '', data, test } = answers
     let name = path.basename(relPath)
 
     // 合并自定义数据
-    let _customData = _.merge({}, config.customData, eval(`(${customData})`))
+    let _customData = _.merge({}, config.customData, eval(`(${data})`))
+
+    // 向上查找的初始层级为3
+    let modelTestLevel = 3
+    modelTestLevel += relPath.split('/').length - 1
+
+    let modelTestRootRelative = '../'.repeat(modelTestLevel)
 
     let newData = {
       name: name,
       pascalCaseName: changeCase.pascalCase(name),
+      testName: relPath,
+      modelTestRootRelative,
       ..._customData
     }
 
     let fileTypes: FileType[] = []
 
-    switch (type) {
+    switch (category) {
       case NewType.Default:
         fileTypes = [FileType.Controller, FileType.Service, FileType.Model]
-        break
-      case NewType.DefaultWithTest:
-        fileTypes = [FileType.Controller, FileType.Service, FileType.Model, FileType.ControllerTest, FileType.ServiceTest]
+        if (test) {
+          fileTypes = fileTypes.concat([FileType.ControllerTest, FileType.ServiceTest, FileType.ModelTest])
+        }
         break
       case NewType.Controller:
         fileTypes = [FileType.Controller]
+        if (test) {
+          fileTypes.push(FileType.ControllerTest)
+        }
         break
       case NewType.Service:
         fileTypes = [FileType.Service]
+        if (test) {
+          fileTypes.push(FileType.ServiceTest)
+        }
         break
       case NewType.Model:
         fileTypes = [FileType.Model]
+        if (test) {
+          fileTypes.push(FileType.ModelTest)
+        }
         break
     }
 
@@ -139,7 +156,7 @@ export class NewCommand {
  * @extends {Answers}
  */
 interface NewAnswers extends Answers {
-  type?: string
+  category?: string
   relPath?: string
 }
 
@@ -150,8 +167,9 @@ export default {
   description: '新建egg文件',
   on: {},
   options: [
-    ['-t, --type <new type>', '新建类型'],
-    ['-c, --customData <custom data>', '自定义数据']
+    ['-c, --category <category>', '新建类型'],
+    ['-t, --test', '是否创建测试'],
+    ['-d, --data <data>', '自定义数据']
   ],
   async action (name: string, options: NewCommand.Options) {
     let newCommand = new NewCommand(options)
@@ -160,20 +178,17 @@ export default {
 }
 
 function getAnswers (options: NewCommand.Options): Promise<NewAnswers> {
-  let { type = '', relPath = '' } = options
+  let { category = '', relPath = '' } = options
 
   const CREATE_QUESTIONS: Question[] = [
     {
       type: 'list',
       message: '请选择新建类型',
-      name: 'type',
+      name: 'category',
       choices: () => {
         return [{
           name: '默认模式',
           value: NewType.Default
-        }, {
-          name: '默认模式（包含test）',
-          value: NewType.DefaultWithTest
         }, {
           name: '新建model',
           value: NewType.Model
@@ -186,7 +201,7 @@ function getAnswers (options: NewCommand.Options): Promise<NewAnswers> {
         }]
       },
       when (answers: any) {
-        return !type
+        return !category
       }
     }, {
       type: 'input',

@@ -47,7 +47,7 @@ export class DeleteCommand {
     let relPath = answers.relPath || ''
     let name = path.basename(relPath)
 
-    let fileTypes: FileType[] = [FileType.Controller, FileType.Service, FileType.Model, FileType.ControllerTest, FileType.ServiceTest]
+    let fileTypes: FileType[] = Object.keys(FileType).map(key => FileType[key])
     let list = fileTypes.map((fileType) => {
       let phycialPath = util.getDestPath(fileType, relPath)
       return {

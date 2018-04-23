@@ -63,13 +63,13 @@ create files by the [name] and a specified type.
 #### New Options
 
 | name | type | description |
-| --- | --- | --- |
-| type | string | new file type |
+| --- | --- | --- | --- |
+| category | string | new file category |
+| test | boolean | whether append test for controller / service / model  |
 
-Available types
+Available category
 
 - `default`: will create controller, service and model.
-- `default-with-test`: will create controller, service, model, controller test and service test.
 - `controller`: will create a controller.
 - `service`: will create a service.
 - `model`: will create a model, the model depends on `mongoose`.
@@ -77,13 +77,13 @@ Available types
 #### create controller / service / model
 
 ```bash
-  eth new user -t default
+  eth new user --category default
 ```
 
 or
 
 ```bash
-  eth new user -type default
+  eth new user -c default
 ```
 
 **Actually the [name] parameter is a path relative to `app/controller` / `app/service` / `app/model`**
@@ -93,13 +93,13 @@ In this example, it will create `app/controller/user.ts`, `app/model/user.ts`, `
 #### create a sub directory controller / service / model
 
 ```bash
-  eth new permission/role -t default
+  eth new permission/role --category default
 ```
 
 or
 
 ```bash
-  eth new permission/role -type default
+  eth new permission/role -c default
 ```
 
 It will create `app/controller/permission/role.ts`, `app/model/permission/role.ts`, `app/service/permission/role.ts`.
@@ -223,12 +223,12 @@ export default class <%=pascalCaseName%>Controller extends Controller {
 }
 ```
 
-There are two built in variables: **`name`** and **`pascalCaseName`**
+There are four built in variables: `name`, `pascalCaseName`, `testName`, `modelTestRootRelative`
 
 ### execute `new` command
 
 ```bash
-  eth new user -t default
+  eth new user -c default
 ```
 
 The content in `app/controller/user.ts` will like this:

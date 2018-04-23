@@ -1,6 +1,6 @@
 {
   "name": "egg-template-helper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "egg template helper",
   "main": "lib/index.js",
   "scripts": {
@@ -11,7 +11,10 @@
   "bin": {
     "eth": "lib/bin/eth.js"
   },
-  "keywords": ["egg", "egg-template-helper"],
+  "keywords": [
+    "egg",
+    "egg-template-helper"
+  ],
   "author": "keepfool",
   "license": "MIT",
   "devDependencies": {

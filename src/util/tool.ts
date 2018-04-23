@@ -110,8 +110,8 @@ export function getTemplatePath (fileType: FileType) {
  *
  */
 export function getDestRelativePath (fileType: FileType, relPath: string) {
-  let isTest = fileType === FileType.ControllerTest || fileType === FileType.ServiceTest
-  let dir = isTest ? 'test/app' : 'app'
+  let test = isTest(fileType)
+  let dir = test ? 'test/app' : 'app'
   dir += `/${fileType.split('.')[0]}`
 
   let subDir = path.dirname(relPath)
@@ -123,8 +123,12 @@ export function getDestRelativePath (fileType: FileType, relPath: string) {
 }
 
 export function getDestPath (fileType: FileType, relPath: string) {
-  let isTest = fileType === FileType.ControllerTest || fileType === FileType.ServiceTest
-  let dir = isTest ? 'test/app' : 'app'
-  let fileName = isTest ? `${relPath}.test${config.ext}` : `${relPath}${config.ext}`
+  let test = isTest(fileType)
+  let dir = test ? 'test/app' : 'app'
+  let fileName = test ? `${relPath}.test${config.ext}` : `${relPath}${config.ext}`
   return path.join(config.cwd, `${dir}/${fileType.split('.')[0]}`, fileName)
+}
+
+function isTest (fileType: FileType) {
+  return fileType === FileType.ControllerTest || fileType === FileType.ServiceTest || fileType === FileType.ModelTest
 }

@@ -5,9 +5,10 @@
  * @enum {string}
  */
 export enum FileType {
-  Model = 'model',
   Controller = 'controller',
   Service = 'service',
+  Model = 'model',
   ControllerTest = 'controller.test',
-  ServiceTest = 'service.test'
+  ServiceTest = 'service.test',
+  ModelTest = 'model.test'
 }
