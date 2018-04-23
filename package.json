@@ -1,6 +1,6 @@
 {
   "name": "egg-template-helper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "egg template helper",
   "main": "lib/index.js",
   "scripts": {
